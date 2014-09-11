@@ -30,8 +30,9 @@ function resolve_service(arg){
             flags  = result[10]
 			//console.log(result);
             deviceList[address] = result;
-            showDeviceList();
+            //showDeviceList();
 		};
+		console.log(arg[0], arg[1], arg[2], arg[3], arg[4], -1, 0);
 		iface.ResolveService(arg[0], arg[1], arg[2], arg[3], arg[4], -1, 0);//arg[5]
 	});
 }
