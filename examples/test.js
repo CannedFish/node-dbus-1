@@ -20,14 +20,23 @@ function itemremovecb(arg){
 mdns.setCbFunctions(itemnewcb, itemremovecb);
 mdns.createServer();
 
-address = '192.168.160.176';
-port = '80';
-name = 'demo-rio';
-txtarray = ['demo-rio', 'hello'];
-// setTimeout(function(){mdns.entryGroupCommit(name, address, port, txtarray)}, 2000);
+setTimeout(function(){
+	name = 'demo-rio';
+	address = '192.168.160.176';
+	port = '80';
+	txtarray = ['demo-rio', 'hello'];
+	mdns.entryGroupCommit(name, address, port, txtarray)
+}, 2000);
+
+
+setTimeout(function(){mdns.showDeviceList()}, 4000);
+
+setTimeout(function(){
+	mdns.entryGroupReset()
+}, 6000);
+
+
+setTimeout(function(){mdns.showDeviceList()}, 8000);
 
 // setTimeout(function(){mdns.createServiceBrowser()}, 200);
 // setTimeout(function(){mdns.createEntryGroup}, 200);
-
-
-setTimeout(function(){mdns.showDeviceList()}, 3000);

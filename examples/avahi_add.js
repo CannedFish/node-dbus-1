@@ -56,21 +56,15 @@ function add_service(path){
 			//console.log(arguments);
 		//}
 
-		// var txt0 = 'hello';
-		// var txt = new Array();
-		// txt.push(stringToByteArray(txt0));
-		// var bytearray = stringToByteArray(txt0);
-  //       	console.log('txt: '+txt);
-		// iface.AddService(-1, -1, 0, 'TestService1', '_http._tcp', '', '', 3000,  txt);
-		// iface.Commit();
-		var name = 'demo-rio'
-		var port = 80
-		txtStr = ['hello', 'world']
-		var txtArray = new Array();
-		for(var i=0; i<txtStr.length; i++){
-			txtArray.push(stringToByteArray(txtStr[i]));
+		address = '192.168.160.176';
+		port = '80';
+		name = 'demo-rio';
+		strarray = ['demo-rio', 'hello'];
+		var byteArray = new Array();
+		for(var i=0; i<strarray.length; i++){
+			byteArray.push(stringToByteArray(strarray[i]));
 		}
-		iface.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  txtArray);
+		iface.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  byteArray);
 		iface.Commit();
 	});
 	

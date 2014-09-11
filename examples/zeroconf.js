@@ -13,30 +13,28 @@ function setCbFunctions(itemnew, itemremove){
 	itemRemoveCb = itemremove;
 }
 function showDeviceList(){
-    console.log("=====device list as below=====");
+    console.log("\n=====device list as below=====");
     var cnt = 1;
-    for(p in deviceList){
+    for(address in deviceList){
         	// console.log(p + " : ", deviceList[p]);
-        	result = deviceList[p]
-		interface = result[0]
-		protocol = result[1]
-		name = result[2]
-		stype = result[3]
-		domain = result[4]
-		host = result[5]
-		aprotocol = result[6]
-		address = result[7]
-		port = result[8]
-		txtarray = result[9]
-		flags  = result[10]
+        	obj = deviceList[address]
+		txtarray = obj.txt
 		var txt = ''
 		for(var i=0; i<txtarray.length; i++){
 			txt += (txtarray[i] + '; ');
 		}		
-		console.log(address + ':' + port + ' - ' + '"' + name + '" (' + txt + ')');
+		console.log(obj.address + ':' + obj.port + ' - ' + '"' + obj.name + '" (' + txt + ')');
     }    
 }
-
+function deleteDeviceList(name){
+    for(address in deviceList){
+        	// console.log(p + " : ", deviceList[p]);
+        	obj = deviceList[address]
+        	if(obj.name == name){
+        		delete deviceList[address];
+        	}
+    }
+}
 function startEntryGroup(path){
 	console.log('A new EntryGroup started, path:' + path);		
 	bus.getInterface('org.freedesktop.Avahi', path, 'org.freedesktop.Avahi.EntryGroup', function(err, iface) {
@@ -51,6 +49,7 @@ function startEntryGroup(path){
 		// iface.AddService['finish'] = function(arg) {
 		// 	console.log('finish add service.');
 		// }
+
 		// address = '192.168.160.176';
 		// port = '80';
 		// name = 'demo-rio';
@@ -63,29 +62,18 @@ function startEntryGroup(path){
 		// iface.Commit();
 	});	
 }
-function createEntryGroup(){
-	bus.getInterface('org.freedesktop.Avahi', '/', 'org.freedesktop.Avahi.Server', function(err, iface) {
-		iface.EntryGroupNew['error'] = function(err) {
-			console.log("EntryGroupNew: " + err);
-		}
-		iface.EntryGroupNew['timeout'] = 1000;
-		iface.EntryGroupNew['finish'] = function(path) {
-			startEntryGroup(path);
-			entryGroupPath = path;
-		};
-		iface.EntryGroupNew();
-	});
-	//server.EntryGroupNew();
-}
 function entryGroupCommit(name , address, port, strarray){
 	//var txtStr = ['hello', 'world'];
-	console.log('valueo of strarray', strarray);
+	console.log('valueo of entryGroupCommit: ', name , address, port, strarray);
 	var byteArray = new Array();
 	for(var i=0; i<strarray.length; i++){
 		byteArray.push(stringToByteArray(strarray[i]));
 	}
 	entryGroup.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  byteArray);
 	entryGroup.Commit();
+}
+function entryGroupReset(){
+	entryGroup.Reset();
 }
 
 function startServiceBrowser(path){
@@ -99,41 +87,23 @@ function startServiceBrowser(path){
 
 		iface.on('ItemNew', function(arg) {
 			//console.log('New:', arg);
-			itemNewCb(arguments);
-			// console.log(server);
-			//server.ResolveService(2, 1, 'TestService', '_http._tcp', 'local', -1, 0);
-			// console.log(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], -1, 0);
 			server.ResolveService(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], -1, 0);
-			//resolve_service(arg[0], arg[1], arg[2], arg[3], arg[4], -1, 0);
+			itemNewCb(arguments);
+			//server.ResolveService(2, 1, 'TestService', '_http._tcp', 'local', -1, 0);
 		});
 		iface.on('ItemRemove', function(arg) {
 			// console.log('Remove:');
+			interface = arguments[0];
+		     protocol = arguments[1];
+		     name = arguments[2];
+		     type = arguments[3];
+		     domain = arguments[4];
+		     flags = arguments[5];
+			deleteDeviceList(name);
 			itemRemoveCb(arguments)
 			// console.log(arguments);
 		});
 	});
-}
-function createServiceBrowser(){
-	bus.getInterface('org.freedesktop.Avahi', '/', 'org.freedesktop.Avahi.Server', function(err, iface) {
-		console.log("server in createServiceBrowser", server);
-		// console.log("iface in createServiceBrowser", iface);
-		if (err != null){
-			console.log(err);
-		}
-		//server = iface;
-
-		iface.ServiceBrowserNew['error'] = function(err) {
-			console.log("ServiceBrowserNew: " + err);
-		}
-		iface.ServiceBrowserNew['timeout'] = 1000;
-		iface.ServiceBrowserNew['finish'] = function(path) {
-			startServiceBrowser(path);
-			serviceBrowserPath = path;
-		};	
-		iface.ServiceBrowserNew(-1, -1, '_http._tcp', 'local', 0);
-	});
-	// console.log("server in createServiceBrowser", server);
-	// server.ServiceBrowserNew(-1, -1, '_http._tcp', 'local', 0);
 }
 
 function createServer(){
@@ -169,29 +139,28 @@ function createServer(){
 		iface.ResolveService['timeout'] = 1000;
 		iface.ResolveService['finish'] = function(result) {
 			// console.log("ResolveService finish");
-			interface = result[0];
-			protocol = result[1];
-			name = result[2];
-			stype = result[3];
-			domain = result[4];
-			host = result[5];
-			aprotocol = result[6];
-			address = result[7];
-			port = result[8];
-			//txt = arrayToString(result[9]);
+			obj = new Object();
+			obj.interface = result[0];
+			obj.protocol = result[1];
+			obj.name = result[2];
+			obj.stype = result[3];
+			obj.domain = result[4];
+			obj.host = result[5];
+			obj.aprotocol = result[6];
+			obj.address = result[7];
+			obj.port = result[8];
 			txtorig = result[9];
 			txt = new Array();
 			for(var i=0; i<txtorig.length; i++){
 				txt.push(arrayToString(txtorig[i]));
 			}
-			result[9] = txt;
-			flags  = result[10];
-	        	deviceList[address] = result;
+			obj.txt = txt;
+			obj.flags  = result[10];
+	        	deviceList[obj.address] = obj;
 			// console.log(result);
-			// console.log(txt);
 	        	//showDeviceList();
 		};
-		// iface.ResolveService(arg[0], arg[1], arg[2], arg[3], arg[4], -1, 0);//arg[5]
+		// iface.ResolveService(arg[0], arg[1], arg[2], arg[3], arg[4], -1, 0);
 
 		// console.log("server in createServer:", server);
 		// console.log("iface in createServer:", iface);
@@ -200,10 +169,11 @@ function createServer(){
 
 exports.setCbFunctions = setCbFunctions;
 exports.createServer = createServer;
-exports.createServiceBrowser = createServiceBrowser;
-exports.createEntryGroup = createEntryGroup;
 exports.showDeviceList = showDeviceList;
 exports.entryGroupCommit = entryGroupCommit;
+exports.entryGroupReset = entryGroupReset;
+// exports.createServiceBrowser = createServiceBrowser;
+// exports.createEntryGroup = createEntryGroup;
 
 stringToByteArray
 function stringToByteArray(str) {
@@ -244,39 +214,51 @@ function arrayToString(array) {
 	return result;
 }
 
-/*
-		//var one1=new Array('a', 'b', 'c');	
-		//var one2=new Array('a', 'b', 'c', 'd');
-		var one1=new Array(1,2,3);	
-		var one2=new Array(4,5,6,7);		
-		var two=new Array(2);
-		two[0] = one1;
-		two[1] = one2;
-		iface.AddService(-1, -1, 0, 'TestService1', '_http._tcp', '', '', 3000,  two);
-		iface.Commit();
-*/
-/*
-function resolve_service(arg){
+function createServiceBrowser(){
 	bus.getInterface('org.freedesktop.Avahi', '/', 'org.freedesktop.Avahi.Server', function(err, iface) {
-		iface.ResolveService['timeout'] = 10000;
-		iface.ResolveService['finish'] = function(result) {
-			//console.log('---------------------------------------------');
-			interface = result[0]
-			protocol = result[1]
-			name = result[2]
-			stype = result[3]
-			domain = result[4]
-			host = result[5]
-			aprotocol = result[6]
-			address = result[7]
-			port = result[8]
-			txt = result[9]
-			flags  = result[10]
-            	deviceList[address] = result;
-			console.log(result);
-            	//showDeviceList();
-		};
-		iface.ResolveService(arg[0], arg[1], arg[2], arg[3], arg[4], -1, 0);//arg[5]
+		console.log("server in createServiceBrowser", server);
+		// console.log("iface in createServiceBrowser", iface);
+		if (err != null){
+			console.log(err);
+		}
+		//server = iface;
+
+		iface.ServiceBrowserNew['error'] = function(err) {
+			console.log("ServiceBrowserNew: " + err);
+		}
+		iface.ServiceBrowserNew['timeout'] = 1000;
+		iface.ServiceBrowserNew['finish'] = function(path) {
+			startServiceBrowser(path);
+			serviceBrowserPath = path;
+		};	
+		iface.ServiceBrowserNew(-1, -1, '_http._tcp', 'local', 0);
 	});
+	// console.log("server in createServiceBrowser", server);
+	// server.ServiceBrowserNew(-1, -1, '_http._tcp', 'local', 0);
 }
-*/
+function createEntryGroup(){
+	bus.getInterface('org.freedesktop.Avahi', '/', 'org.freedesktop.Avahi.Server', function(err, iface) {
+		iface.EntryGroupNew['error'] = function(err) {
+			console.log("EntryGroupNew: " + err);
+		}
+		iface.EntryGroupNew['timeout'] = 1000;
+		iface.EntryGroupNew['finish'] = function(path) {
+			startEntryGroup(path);
+			entryGroupPath = path;
+		};
+		iface.EntryGroupNew();
+	});
+	//server.EntryGroupNew();
+}
+
+		// interface = result[0]
+		// protocol = result[1]
+		// name = result[2]
+		// stype = result[3]
+		// domain = result[4]
+		// host = result[5]
+		// aprotocol = result[6]
+		// address = result[7]
+		// port = result[8]
+		// txtarray = result[9]
+		// flags  = result[10]
