@@ -3,7 +3,7 @@ var DBus = require('../');
 var dbus = new DBus();
 
 var bus = dbus.getBus('system');
-function toUTF8Array(str) {
+function stringToByteArray(str) {
     var utf8 = [];
     for (var i=0; i < str.length; i++) {
         var charcode = str.charCodeAt(i);
@@ -55,21 +55,22 @@ function add_service(path){
 		//iface.AddService['finish'] = function(arg) {
 			//console.log(arguments);
 		//}
-		//var one1=new Array('a', 'b', 'c');	
-		//var one2=new Array('a', 'b', 'c', 'd');	
-		// var one1=new Array(1,2,3);	
-		// var one2=new Array(4,5,6,7);		
-		// var two=new Array(2);
-		// two[0] = one1;
-		// two[1] = one2;
-		var txt0 = 'hello';
-		var txt = new Array();
-		txt.push(toUTF8Array(txt0));
-		var bytearray = toUTF8Array(txt0);
-        	console.log('txt: '+txt);
 
-		iface.AddService(-1, -1, 0, 'TestService1', '_http._tcp', '', '', 3000,  txt);
-		// iface.AddService(-1, -1, 0, 'TestService1', '_http._tcp', 'local', '192.168.160.176', 3000,  txt);
+		// var txt0 = 'hello';
+		// var txt = new Array();
+		// txt.push(stringToByteArray(txt0));
+		// var bytearray = stringToByteArray(txt0);
+  //       	console.log('txt: '+txt);
+		// iface.AddService(-1, -1, 0, 'TestService1', '_http._tcp', '', '', 3000,  txt);
+		// iface.Commit();
+		var name = 'demo-rio'
+		var port = 80
+		txtStr = ['hello', 'world']
+		var txtArray = new Array();
+		for(var i=0; i<txtStr.length; i++){
+			txtArray.push(stringToByteArray(txtStr[i]));
+		}
+		iface.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  txtArray);
 		iface.Commit();
 	});
 	

@@ -17,27 +17,17 @@ function itemremovecb(arg){
 	flags = arg[5]
 	console.log('A device is removed, name: "'+  name + '"');
 }
+mdns.setCbFunctions(itemnewcb, itemremovecb);
+mdns.createServer();
+
 address = '192.168.160.176';
 port = '80';
-mdns.setCbFunctions(itemnewcb, itemremovecb, address, port);
-mdns.createServer();
+name = 'demo-rio';
+txtarray = ['demo-rio', 'hello'];
+// setTimeout(function(){mdns.entryGroupCommit(name, address, port, txtarray)}, 2000);
 
 // setTimeout(function(){mdns.createServiceBrowser()}, 200);
 // setTimeout(function(){mdns.createEntryGroup}, 200);
 
-// setTimeout(function(){
-// 			//var one1=new Array('a', 'b', 'c');	
-// 		//var one2=new Array('a', 'b', 'c', 'd');
-// 		var one1=new Array(1,2,3);	
-// 		var one2=new Array(4,5,6,7);		
-// 		var two=new Array(2);
-// 		two[0] = one1;
-// 		two[1] = one2;
-// 		iface.AddService(-1, -1, 0, 'TestService1', '_http._tcp', '', '', 3000,  two);
-// 		iface.Commit();
-// }, 400);
 
-
-setTimeout(function(){mdns.showDeviceList()}, 1000);
-// mdns.showServer();
-
+setTimeout(function(){mdns.showDeviceList()}, 3000);

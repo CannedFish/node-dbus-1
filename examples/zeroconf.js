@@ -6,13 +6,11 @@ var bus = dbus.getBus('system');
 
 var serviceBrowserPath, entryGroupPath;
 var server, serviceBrowser, entryGroup;
-var itemNewCb, itemRemoveCb, address, port;
+var itemNewCb, itemRemoveCb;
 var deviceList = {}
-function setCbFunctions(itemnew, itemremove, ip, port){
+function setCbFunctions(itemnew, itemremove){
 	itemNewCb = itemnew;
 	itemRemoveCb = itemremove;
-	address = ip;
-	port = port;
 }
 function showDeviceList(){
     console.log("=====device list as below=====");
@@ -29,9 +27,13 @@ function showDeviceList(){
 		aprotocol = result[6]
 		address = result[7]
 		port = result[8]
-		txt = result[9]
+		txtarray = result[9]
 		flags  = result[10]
-		console.log(cnt++ + '. "' + name + '" - ' + address + ':' + port);
+		var txt = ''
+		for(var i=0; i<txtarray.length; i++){
+			txt += (txtarray[i] + '; ');
+		}		
+		console.log(address + ':' + port + ' - ' + '"' + name + '" (' + txt + ')');
     }    
 }
 
@@ -46,9 +48,19 @@ function startEntryGroup(path){
 		iface.AddService['error'] = function(err) {
 			console.log(err);
 		}
-		iface.AddService['finish'] = function(arg) {
-			console.log(arguments);
-		}
+		// iface.AddService['finish'] = function(arg) {
+		// 	console.log('finish add service.');
+		// }
+		// address = '192.168.160.176';
+		// port = '80';
+		// name = 'demo-rio';
+		// strarray = ['demo-rio', 'hello'];
+		// var byteArray = new Array();
+		// for(var i=0; i<strarray.length; i++){
+		// 	byteArray.push(stringToByteArray(strarray[i]));
+		// }
+		// iface.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  byteArray);
+		// iface.Commit();
 	});	
 }
 function createEntryGroup(){
@@ -65,8 +77,15 @@ function createEntryGroup(){
 	});
 	//server.EntryGroupNew();
 }
-function entryGroupCommit(){
-
+function entryGroupCommit(name , address, port, strarray){
+	//var txtStr = ['hello', 'world'];
+	console.log('valueo of strarray', strarray);
+	var byteArray = new Array();
+	for(var i=0; i<strarray.length; i++){
+		byteArray.push(stringToByteArray(strarray[i]));
+	}
+	entryGroup.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  byteArray);
+	entryGroup.Commit();
 }
 
 function startServiceBrowser(path){
@@ -178,18 +197,16 @@ function createServer(){
 		// console.log("iface in createServer:", iface);
 	});
 }
-function showServer(){
-	console.log("server", server);
-}
+
 exports.setCbFunctions = setCbFunctions;
 exports.createServer = createServer;
 exports.createServiceBrowser = createServiceBrowser;
 exports.createEntryGroup = createEntryGroup;
 exports.showDeviceList = showDeviceList;
-exports.showServer = showServer;
+exports.entryGroupCommit = entryGroupCommit;
 
-
-function toUTF8Array(str) {
+stringToByteArray
+function stringToByteArray(str) {
     var utf8 = [];
     for (var i=0; i < str.length; i++) {
         var charcode = str.charCodeAt(i);
