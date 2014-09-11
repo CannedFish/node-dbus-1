@@ -15,9 +15,11 @@ function itemremovecb(arg){
 	type = arg[3]
 	domain = arg[4]
 	flags = arg[5]
-	console.log('A new device is add, name: "'+  name + '"');
+	console.log('A device is removed, name: "'+  name + '"');
 }
-mdns.setCbFunctions(itemnewcb, itemremovecb);
+address = '192.168.160.176';
+port = '80';
+mdns.setCbFunctions(itemnewcb, itemremovecb, address, port);
 mdns.createServer();
 
 // setTimeout(function(){mdns.createServiceBrowser()}, 200);
