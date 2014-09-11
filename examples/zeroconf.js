@@ -9,20 +9,46 @@ var server, serviceBrowser, entryGroup;
 var deviceListeners = new Array();
 var deviceList = new Object();
 
+/**
+ * @method addDeviceListener
+ *  为signal ItemNew和ItemRemove添加回调方法
+ *
+ * @param1 cb
+ *   回调函数
+ *
+ */
 function addDeviceListener(cb){
     deviceListeners.push(cb);
 }
+exports.addDeviceListener = addDeviceListener;
+
+/**
+ * @method removeDeviceListener
+ *  删除列表中的某一个回调方法
+ *
+ * @param1 cb
+ *   回调函数
+ *
+ */
 function removeDeviceListener(cb){
     for(index in deviceListeners){
         if(deviceListeners[index] == cb)
             deviceListeners.splice(index, 1);
         }
 }
+exports.removeDeviceListener = removeDeviceListener;
+
 function callDeviceListener(type, args){
     for(index in deviceListeners){
         deviceListeners[index](type, args);
     }
 }
+
+/**
+ * @method showDeviceList
+ *  显示当前设备列表
+ *
+ */
 function showDeviceList(){
     console.log("\n=====device list as below=====");
     var cnt = 1;
@@ -33,49 +59,41 @@ function showDeviceList(){
         var txt = ''
         for(var i=0; i<txtarray.length; i++){
             txt += (txtarray[i] + '; ');
-        }        
+         }        
         console.log(obj.address + ':' + obj.port + ' - ' + '"' + obj.name + '" (' + txt + ')');
     }    
 }
+exports.showDeviceList = showDeviceList;
+
 function deleteDeviceList(name){
     var obj;
     for(address in deviceList){
-            // console.log(p + " : ", deviceList[p]);
-            obj = deviceList[address]
-            if(obj.name == name){
-                delete deviceList[address];
-            }
-    }
+        // console.log(p + " : ", deviceList[p]);
+        obj = deviceList[address]
+        if(obj.name == name){
+            delete deviceList[address];
+         }
+     }
 }
-function startEntryGroup(path){
-    console.log('A new EntryGroup started, path:' + path);        
-    bus.getInterface('org.freedesktop.Avahi', path, 'org.freedesktop.Avahi.EntryGroup', function(err, iface) {
-        if (err != null){
-            console.log(err);
-        }
-        entryGroup = iface;
-        iface.AddService['timeout'] = 1000;
-        iface.AddService['error'] = function(err) {
-            console.log(err);
-        }
-        // iface.AddService['finish'] = function(arg) {
-        //     console.log('finish add service.');
-        // }
 
-        // address = '192.168.160.176';
-        // port = '80';
-        // name = 'demo-rio';
-        // strarray = ['demo-rio', 'hello'];
-        // var byteArray = new Array();
-        // for(var i=0; i<strarray.length; i++){
-        //     byteArray.push(stringToByteArray(strarray[i]));
-        // }
-        // iface.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  byteArray);
-        // iface.Commit();
-    });    
-}
+/**
+ * @method entryGroupCommit
+ *  添加服务信息，并在局域网发布设备上线信息
+ *
+ * @param1 name
+ *   设备名称
+ *
+ * @param2 address
+ *   设备ip地址
+ *
+ * @param3 port
+ *   设备端口
+ *
+ * @param4 strarray
+ *   设备附加信息
+ *
+ */
 function entryGroupCommit(name , address, port, strarray){
-    //var txtStr = ['hello', 'world'];
     // console.log('value of entryGroupCommit: ', name , address, port, strarray);
     var byteArray = new Array();
     for(var i=0; i<strarray.length; i++){
@@ -84,40 +102,23 @@ function entryGroupCommit(name , address, port, strarray){
     entryGroup.AddService(-1, -1, 0, name, '_http._tcp', '', '', port,  byteArray);
     entryGroup.Commit();
 }
+exports.entryGroupCommit = entryGroupCommit;
+
+/**
+ * @method entryGroupReset
+ *  在局域网发布设备下线信息
+ *
+ */
 function entryGroupReset(){
     entryGroup.Reset();
 }
+exports.entryGroupReset = entryGroupReset;
 
-function startServiceBrowser(path){
-    console.log('A new ServiceBrowser started, path:' + path);
-    // console.log("server in startServiceBrowser", server);
-    bus.getLocalInterface('org.freedesktop.Avahi', path, 'org.freedesktop.Avahi.ServiceBrowser', '../org.freedesktop.Avahi.ServiceBrowser.xml', function(err, iface) {
-        if (err != null){
-            console.log(err);
-        }
-        serviceBrowser = iface;
-
-        iface.on('ItemNew', function(arg) {
-            //console.log('New:', arg);
-            server.ResolveService(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], -1, 0);
-            callDeviceListener('ItemNew', arguments);
-            //server.ResolveService(2, 1, 'TestService', '_http._tcp', 'local', -1, 0);
-        });
-        iface.on('ItemRemove', function(arg) {
-            // console.log('Remove:');
-            var interface = arguments[0];
-             var protocol = arguments[1];
-             var name = arguments[2];
-             var type = arguments[3];
-             var domain = arguments[4];
-             var flags = arguments[5];
-            deleteDeviceList(name);
-            callDeviceListener('ItemRemove', arguments);
-            // console.log(arguments);
-        });
-    });
-}
-
+/**
+ * @method createServer
+ *  启动服务，包括ServiceBrowser和EntryGroup
+ *
+ */
 function createServer(){
     bus.getInterface('org.freedesktop.Avahi', '/', 'org.freedesktop.Avahi.Server', function(err, iface) {
         if (err != null){
@@ -178,13 +179,54 @@ function createServer(){
         // console.log("iface in createServer:", iface);
     });
 }
-
-exports.addDeviceListener = addDeviceListener;
-exports.removeDeviceListener = removeDeviceListener;
 exports.createServer = createServer;
-exports.showDeviceList = showDeviceList;
-exports.entryGroupCommit = entryGroupCommit;
-exports.entryGroupReset = entryGroupReset;
+
+function startEntryGroup(path){
+    console.log('A new EntryGroup started, path:' + path);        
+    bus.getInterface('org.freedesktop.Avahi', path, 'org.freedesktop.Avahi.EntryGroup', function(err, iface) {
+        if (err != null){
+            console.log(err);
+         }
+        entryGroup = iface;
+        iface.AddService['timeout'] = 1000;
+        iface.AddService['error'] = function(err) {
+            console.log(err);
+         }
+        // iface.AddService['finish'] = function(arg) {
+        //     console.log('finish add service.');
+        // }
+    });    
+}
+
+function startServiceBrowser(path){
+    console.log('A new ServiceBrowser started, path:' + path);
+    bus.getLocalInterface('org.freedesktop.Avahi', path, 'org.freedesktop.Avahi.ServiceBrowser', '../org.freedesktop.Avahi.ServiceBrowser.xml', function(err, iface) {
+        if (err != null){
+            console.log(err);
+        }
+        serviceBrowser = iface;
+
+        iface.on('ItemNew', function(arg) {
+            //console.log('New:');
+            server.ResolveService(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], -1, 0);
+            callDeviceListener('ItemNew', arguments);
+            //server.ResolveService(2, 1, 'TestService', '_http._tcp', 'local', -1, 0);
+        });
+        iface.on('ItemRemove', function(arg) {
+            // console.log('Remove:');
+            var interface = arguments[0];
+            var protocol = arguments[1];
+            var name = arguments[2];
+            var type = arguments[3];
+            var domain = arguments[4];
+            var flags = arguments[5];
+            deleteDeviceList(name);
+            callDeviceListener('ItemRemove', arguments);
+        });
+    });
+}
+
+
 // exports.createServiceBrowser = createServiceBrowser;
 // exports.createEntryGroup = createEntryGroup;
 
