@@ -1,30 +1,30 @@
 var mdns = require('./zeroconf');
 function itemnewcb(arg){
-	interface = arg[0]
-	protocol = arg[1]
-	name = arg[2]
-	type = arg[3]
-	domain = arg[4]
-	flags = arg[5]
+	var interface = arg[0]
+	var protocol = arg[1]
+	var name = arg[2]
+	var type = arg[3]
+	var domain = arg[4]
+	var flags = arg[5]
 	console.log('A new device is add, name: "'+  name + '"');
 }
 function itemremovecb(arg){
-	interface = arg[0]
-	protocol = arg[1]
-	name = arg[2]
-	type = arg[3]
-	domain = arg[4]
-	flags = arg[5]
+	var interface = arg[0]
+	var protocol = arg[1]
+	var name = arg[2]
+	var type = arg[3]
+	var domain = arg[4]
+	var flags = arg[5]
 	console.log('A device is removed, name: "'+  name + '"');
 }
 mdns.setCbFunctions(itemnewcb, itemremovecb);
 mdns.createServer();
 
 setTimeout(function(){
-	name = 'demo-rio';
-	address = '192.168.160.176';
-	port = '80';
-	txtarray = ['demo-rio', 'hello'];
+	var name = 'demo-rio';
+	var address = '192.168.160.176';
+	var port = '80';
+	var txtarray = ['demo-rio', 'hello'];
 	mdns.entryGroupCommit(name, address, port, txtarray)
 }, 2000);
 

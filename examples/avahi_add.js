@@ -69,7 +69,7 @@ function add_service(path){
 	});
 	
 }
-
+	
 bus.getInterface('org.freedesktop.Avahi', '/', 'org.freedesktop.Avahi.Server', function(err, iface) {
 
 	iface.EntryGroupNew['timeout'] = 1000;

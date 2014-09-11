@@ -15,10 +15,11 @@ function setCbFunctions(itemnew, itemremove){
 function showDeviceList(){
     console.log("\n=====device list as below=====");
     var cnt = 1;
+    var obj;
     for(address in deviceList){
         	// console.log(p + " : ", deviceList[p]);
         	obj = deviceList[address]
-		txtarray = obj.txt
+		var txtarray = obj.txt
 		var txt = ''
 		for(var i=0; i<txtarray.length; i++){
 			txt += (txtarray[i] + '; ');
@@ -27,6 +28,7 @@ function showDeviceList(){
     }    
 }
 function deleteDeviceList(name){
+	var obj;
     for(address in deviceList){
         	// console.log(p + " : ", deviceList[p]);
         	obj = deviceList[address]
@@ -93,12 +95,12 @@ function startServiceBrowser(path){
 		});
 		iface.on('ItemRemove', function(arg) {
 			// console.log('Remove:');
-			interface = arguments[0];
-		     protocol = arguments[1];
-		     name = arguments[2];
-		     type = arguments[3];
-		     domain = arguments[4];
-		     flags = arguments[5];
+			var interface = arguments[0];
+		     var protocol = arguments[1];
+		     var name = arguments[2];
+		     var type = arguments[3];
+		     var domain = arguments[4];
+		     var flags = arguments[5];
 			deleteDeviceList(name);
 			itemRemoveCb(arguments)
 			// console.log(arguments);
@@ -175,7 +177,6 @@ exports.entryGroupReset = entryGroupReset;
 // exports.createServiceBrowser = createServiceBrowser;
 // exports.createEntryGroup = createEntryGroup;
 
-stringToByteArray
 function stringToByteArray(str) {
     var utf8 = [];
     for (var i=0; i < str.length; i++) {
@@ -250,15 +251,14 @@ function createEntryGroup(){
 	});
 	//server.EntryGroupNew();
 }
-
-		// interface = result[0]
-		// protocol = result[1]
-		// name = result[2]
-		// stype = result[3]
-		// domain = result[4]
-		// host = result[5]
-		// aprotocol = result[6]
-		// address = result[7]
-		// port = result[8]
-		// txtarray = result[9]
-		// flags  = result[10]
+// interface = result[0]
+// protocol = result[1]
+// name = result[2]
+// stype = result[3]
+// domain = result[4]
+// host = result[5]
+// aprotocol = result[6]
+// address = result[7]
+// port = result[8]
+// txtarray = result[9]
+// flags  = result[10]
