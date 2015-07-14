@@ -16,7 +16,9 @@ namespace Encoder {
 	{
 		if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
 			return const_cast<char*>(DBUS_TYPE_BOOLEAN_AS_STRING);
-		} else if (value->IsInt32()) {
+		} else if (value->IsNull() || value->IsUndefined()) {
+      return const_cast<char*>(DBUS_TYPE_STRING_AS_STRING);
+    } else if (value->IsInt32()) {
 			return const_cast<char*>(DBUS_TYPE_INT32_AS_STRING);
 		} else if (value->IsUint32()) {
 			return const_cast<char*>(DBUS_TYPE_UINT32_AS_STRING);
