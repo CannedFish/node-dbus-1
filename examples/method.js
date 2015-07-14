@@ -1,6 +1,7 @@
 var DBus = require('../');
 
-var dbus = new DBus();
+// var dbus = new DBus();
+var dbus = DBus.instance();
 
 var bus = dbus.getBus('session');
 
@@ -18,6 +19,12 @@ bus.getInterface('nodejs.dbus.ExampleService', '/nodejs/dbus/ExampleService', 'n
 
 	// Blank object
 	iface.SendObject({});
+
+  iface.SendObject({
+    name: undefined,
+    email: null,
+    msg: 'this is a msg'
+  });
 
 	// Testing method with no return value
 	iface.Dummy['timeout'] = 1000;

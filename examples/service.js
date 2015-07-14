@@ -1,6 +1,7 @@
 var DBus = require('../');
 
-var dbus = new DBus();
+// var dbus = new DBus();
+var dbus = DBus.instance();
 
 // Create a new service, object and interface
 var service = dbus.registerService('session', 'nodejs.dbus.ExampleService');
@@ -25,6 +26,7 @@ iface1.addMethod('Hello', { out: DBus.Define(String) }, function(callback) {
 });
 
 iface1.addMethod('SendObject', { in: [ DBus.Define(Object) ], out: DBus.Define(Object) }, function(obj, callback) {
+  console.log(obj);
 	callback(obj);
 });
 

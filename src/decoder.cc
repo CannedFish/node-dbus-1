@@ -1,6 +1,7 @@
 #include <v8.h>
 #include <node.h>
 #include <string>
+#include <string.h>
 #include <dbus/dbus.h>
 
 #include "decoder.h"
@@ -58,7 +59,13 @@ namespace Decoder {
 		{
 			const char *value;
 			dbus_message_iter_get_basic(iter, &value); 
-			return scope.Close(String::New(value));
+      if(strncmp(value, "null", 4) == 0) {
+        return scope.Close(Null());
+      } else if(strncmp(value, "undefined", 9) == 0) {
+        return scope.Close(Undefined());
+      } else {
+			  return scope.Close(String::New(value));
+      }
 		}
 
 		case DBUS_TYPE_STRUCT:
