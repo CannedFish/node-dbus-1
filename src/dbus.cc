@@ -129,6 +129,7 @@ namespace NodeDBus {
 
 	Handle<Value> CallMethod(const Arguments& args)
 	{
+    // TODO: add a parameter called sync. If sync is true, call mathod syncronised
 		HandleScope scope;
 		DBusError error;
 
